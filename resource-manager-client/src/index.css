@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+
+:root {
+  --color-dark-bg:black;
+  --color-dark-card:black;
+  --color-dark-input-border: #1a1b26;
+  --color-dark-text: #EAEAEA;
+  --color-dark-text-secondary: #A9A9A9;
+  --color-dark-accent: #007AFF; /* A nice blue for buttons/links */
+  --color-dark-button-hover: #0056b3;
+}
+
+
+/* Here, we apply our theme variables to the base styles of the application.
+  This sets the default background and text color for the entire site.
+*/
+@layer base {
+  body {
+    background-color: var(--color-dark-bg);
+    color: var(--color-dark-text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
