@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useLogin } from "../../hooks/useLogin";
-import { Eye, EyeOff } from "lucide-react"; // 👈 import icons
+import { Eye, EyeOff } from "lucide-react"; 
 
 const LoginForm = ({ onSwitchMode }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // 👈 toggle state
+  const [showPassword, setShowPassword] = useState(false); 
   const { login, isLoading, error } = useLogin();
 
   const handleLogin = (e) => {

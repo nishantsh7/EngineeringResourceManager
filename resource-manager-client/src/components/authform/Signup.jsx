@@ -27,7 +27,7 @@ const SignupForm = ({ onSwitchMode }) => {
 
   return (
     <div className="flex flex-col gap-2">
-      <h1 className="text-3xl font-bold text-dark-text">Welcome To KVP</h1>
+      <h1 className="text-3xl font-bold text-dark-text">Welcome To ManageAssis</h1>
       <p className="text-[#84858c] mb-6">Create your account</p>
 
       <form onSubmit={handleSignup} className="space-y-8">
