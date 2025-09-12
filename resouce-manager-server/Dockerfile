@@ -1,21 +1,18 @@
-# Use Node.js as the base image
-FROM node:18
+# Use a slim Node.js image for a smaller footprint
+FROM node:18-slim
 
-# Set working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json to the container
-COPY package.json package-lock.json ./
+# Copy only package files first to leverage Docker's layer caching
+COPY package*.json ./
 
+# Install ONLY production dependencies
+RUN npm install --only=production
 
-# Install dependencies
-RUN npm install
-
-# Copy the entire backend code to the container
+# Copy the rest of the application code
 COPY . .
 
-# Expose port 8080 (or the port your backend runs on)
 EXPOSE 8080
 
-# Start the backend server
-CMD ["npm", "start"]
+# Run the app directly with node for a faster startup
+CMD ["node", "server.js"]

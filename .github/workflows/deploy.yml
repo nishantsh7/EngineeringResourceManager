@@ -1,4 +1,4 @@
-name: Deploy Webinar App to Google Cloud Run
+name: Deploy Projex to Google Cloud Run
 
 on:
   push:
@@ -7,14 +7,18 @@ on:
 
 jobs:
   deploy:
-    name: Deploy Backend & Frontend to Google Cloud Run
+    name: Build and Deploy to Google Cloud Run
     runs-on: ubuntu-latest
+    
+    # Grant permissions for the new google-github-actions/auth method
+    permissions:
+      contents: 'read'
+      id-token: 'write'
 
     env:
-      PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-      GCP_SERVICE_KEY_BASE64: ${{ secrets.GCP_SERVICE_KEY_BASE64 }}
-      REPO_NAME: ${{ secrets.GCP_REPO_NAME }}
-      # Frontend Firebase config
+      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      GCP_REPO_NAME: ${{ secrets.GCP_REPO_NAME }}
+      # Frontend Firebase config (your setup is perfect)
       VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
       VITE_AUTH_DOMAIN: ${{ secrets.VITE_AUTH_DOMAIN }}
       VITE_PROJECT_ID: ${{ secrets.VITE_PROJECT_ID }}
@@ -27,16 +31,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Authenticate with Google Cloud
+      - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          # Use decoded service account key directly
+          # This uses the DEPLOYMENT KEY to give GitHub Actions permission to deploy
           credentials_json: ${{ secrets.GCP_SERVICE_KEY }}
 
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Configure Docker Authentication
         run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
@@ -44,8 +46,8 @@ jobs:
       # 🚀 Build & Push Backend Image
       - name: Build and Push Backend Docker Image
         run: |
-          docker build -t us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/backend:latest ./resouce-manager-server
-          docker push us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/backend:latest
+          docker build -t us-central1-docker.pkg.dev/$GCP_PROJECT_ID/$GCP_REPO_NAME/backend:latest ./resouce-manager-server
+          docker push us-central1-docker.pkg.dev/$GCP_PROJECT_ID/$GCP_REPO_NAME/backend:latest
 
       # 🚀 Build & Push Frontend Image
       - name: Build and Push Frontend Docker Image
@@ -58,26 +60,29 @@ jobs:
             --build-arg VITE_MESSAGING_SENDER_ID=$VITE_MESSAGING_SENDER_ID \
             --build-arg VITE_APP_ID=$VITE_APP_ID \
             --build-arg VITE_MEASUREMENT_ID=$VITE_MEASUREMENT_ID \
-            -t us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/frontend:latest ./resoource-manager-client
-          docker push us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/frontend:latest
+            -t us-central1-docker.pkg.dev/$GCP_PROJECT_ID/$GCP_REPO_NAME/frontend:latest ./resource-manager-client
+          docker push us-central1-docker.pkg.dev/$GCP_PROJECT_ID/$GCP_REPO_NAME/frontend:latest
 
       # 🚀 Deploy Backend to Cloud Run
       - name: Deploy Backend to Cloud Run
         run: |
-          gcloud run deploy backend-webinarapp \
-            --image us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/backend:latest \
+          gcloud run deploy projex-backend \
+            --image us-central1-docker.pkg.dev/$GCP_PROJECT_ID/$GCP_REPO_NAME/backend:latest \
             --region us-central1 \
             --platform managed \
             --allow-unauthenticated \
-            --set-env-vars "GCP_PROJECT_ID=$PROJECT_ID,GCP_SERVICE_KEY_BASE64=$GCP_SERVICE_KEY_BASE64" \
+            # --- THIS IS THE CRITICAL FIX ---
+            # We pass the APPLICATION KEY to the running container so the Node.js app can talk to Firebase.
+            --set-env-vars "FIREBASE_SERVICE_KEY_BASE64=${{ secrets.FIREBASE_SERVICE_KEY_BASE64 }}" \
             --quiet
 
       # 🚀 Deploy Frontend to Cloud Run
       - name: Deploy Frontend to Cloud Run
         run: |
-          gcloud run deploy webinar-app \
-            --image us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/frontend:latest \
+          gcloud run deploy projex-frontend \
+            --image us-central1-docker.pkg.dev/$GCP_PROJECT_ID/$GCP_REPO_NAME/frontend:latest \
             --region us-central1 \
             --platform managed \
             --allow-unauthenticated \
             --quiet
+

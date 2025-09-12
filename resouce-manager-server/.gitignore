@@ -13,8 +13,12 @@ coverage/
 .env
 .env.*       # all env files
 
-# Firebase / GCP
+# Firebase
 engineering-resource-service-account-key.json
+#GCP
+engineering-service-key.json
+
+aidocs
 
 # Logs
 *.log

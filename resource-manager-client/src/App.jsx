@@ -3,12 +3,14 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from './firebase/config';
-import useAuthStore from './store/authStore'
+import useAuthStore from './store/authStore';
+
+// Import all our pages and layouts
 import AuthPage from './pages/AuthPage';
-import DashboardLayout from './layout/DashboardLayout'; 
-import DashboardPage from './pages/DashboardPage';   
-import TeamPage from './pages/TeamPage';    
-import EngineerProfilePage from './pages/EngineerProfilePage';        
+import DashboardLayout from './layout/DashboardLayout';
+import DashboardPage from './pages/DashboardPage';
+import TeamPage from './pages/TeamPage';
+import EngineerProfilePage from './pages/EngineerProfilePage';
 
 function App() {
   const { user, setUser, setProfile, setLoading } = useAuthStore();
@@ -42,11 +44,9 @@ function App() {
       
       <Route element={user ? <DashboardLayout /> : <Navigate to="/auth" />}>
         <Route path="/" element={<DashboardPage />} />
-
-        {/* --- THIS IS THE KEY CHANGE --- */}
-        {/* The more specific route now comes BEFORE the more general one. */}
-        <Route path="/team/:engineerId" element={<EngineerProfilePage />} />
         <Route path="/team" element={<TeamPage />} />
+        <Route path="/team/:engineerId" element={<EngineerProfilePage />} />
+        <Route path="/profile" element={<EngineerProfilePage />} />
 
       </Route>
 
@@ -56,3 +56,4 @@ function App() {
 }
 
 export default App;
+
