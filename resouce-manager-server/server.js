@@ -7,10 +7,6 @@ const admin = require('firebase-admin');
 if (!process.env.FIREBASE_SERVICE_KEY) {
     throw new Error('The FIREBASE_SERVICE_ACCOUNT environment variable is not set.');
 }
-
-// Decode the base64 key provided by the Cloud Run environment.
-// const serviceAccountBase64 = process.env.FIREBASE_SERVICE_KEY_BASE64;
-// const serviceAccountJson = Buffer.from(serviceAccountBase64, 'base64').toString('utf-8');
 const serviceAccountJson = process.env.FIREBASE_SERVICE_KEY;
 const serviceAccount = JSON.parse(serviceAccountJson);
 
