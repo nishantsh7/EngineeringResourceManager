@@ -5,20 +5,15 @@ const fs = require('fs'); // <-- Import the Node.js file system module
 
 // --- PRODUCTION-GRADE INITIALIZATION ---
 let serviceAccount;
-const secretPath = '/etc/secrets/firebase-key'; // This is the path where Cloud Run will mount our secret
+const secretPath = '/etc/secrets/firebase-key'; 
 
-// In production (Cloud Run), we expect the secret to be mounted as a file.
+
 if (fs.existsSync(secretPath)) {
     const serviceAccountJson = fs.readFileSync(secretPath, 'utf8');
     serviceAccount = JSON.parse(serviceAccountJson);
-} else if (process.env.NODE_ENV !== 'production') {
-    // For local development, we fall back to reading the local JSON file.
-    console.log('Running in local development mode, reading key file directly.');
-    serviceAccount = require('./engineering-resource-service-account-key.json');
-} else {
-    // If we're in production and the file doesn't exist, we must crash.
+} else
     throw new Error(`Production environment detected, but secret file not found at ${secretPath}`);
-}
+
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
