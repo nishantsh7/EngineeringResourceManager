@@ -44,7 +44,7 @@ jobs:
       # 🚀 Build & Push Backend Image
       - name: Build and Push Backend Docker Image
         run: |
-          docker build -t us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/backend:latest ./resource-manager-service
+          docker build -t us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/backend:latest ./resource-manager-server
           docker push us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/backend:latest
 
       # 🚀 Build & Push Frontend Image
