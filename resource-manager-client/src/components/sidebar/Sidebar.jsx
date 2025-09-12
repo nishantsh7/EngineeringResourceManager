@@ -18,7 +18,7 @@ const Sidebar = () => {
       <div>
         <h1 className="text-2xl font-bold text-white mb-12">Projex</h1>
         <nav className="space-y-4">
-          <NavLink to="/" className={getLinkClass} end>
+          <NavLink to="/dashboard" className={getLinkClass} end>
             <Icon path="M3.75 3v11.25A2.25 2.25 0 006 16.5h12A2.25 2.25 0 0020.25 14.25V3M3.75 3v-1.5A2.25 2.25 0 016 0h12A2.25 2.25 0 0120.25 1.5V3M3.75 3H1.5m19.5 0H22.5" />
             <span>Projects</span>
           </NavLink>

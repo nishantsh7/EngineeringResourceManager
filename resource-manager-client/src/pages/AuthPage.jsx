@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Login from '../components/authform/Login'
 import Signup from '../components/authform/Signup'
+import LogoNav from '../layout/LogoNav';
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -12,6 +13,7 @@ const AuthPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[--color-dark-bg] p-4">
       {/* This is the main card, styled to match the image */}
+      <LogoNav />
       <div className="w-full max-w-md rounded-2xl shadow-lg bg-[--color-dark-card] p-8">
         {isLogin ? (
           <Login onSwitchMode={switchModeHandler} />

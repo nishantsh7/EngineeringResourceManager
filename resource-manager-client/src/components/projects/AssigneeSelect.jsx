@@ -7,7 +7,7 @@ const seniorityLevels = { 'Junior': 1, 'Mid': 2, 'Senior': 3 };
 
 const AssigneeSelector = ({ existingAssignments = [], onBack, onComplete, submitting }) => {
   const { engineers, loading: engineersLoading } = useEngineers();
-  const { assignments, loading: assignmentsLoading } = useAssignments(); 
+  const { assignments, loading: assignmentsLoading } = useAssignments();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedEngineers, setSelectedEngineers] = useState({});
 
@@ -41,7 +41,7 @@ const AssigneeSelector = ({ existingAssignments = [], onBack, onComplete, submit
       .sort((a, b) => b.availableHours - a.availableHours);
   }, [engineerWorkloads, existingAssignments, managerSeniority]);
 
-  
+
 
   // --- THIS IS THE UPGRADED SEARCH LOGIC ---
   const filteredEngineers = useMemo(() => {
@@ -63,6 +63,7 @@ const AssigneeSelector = ({ existingAssignments = [], onBack, onComplete, submit
   const handleHourChange = (engineerId, hours) => { setSelectedEngineers(prev => ({ ...prev, [engineerId]: parseInt(hours, 10) || 0 })); };
   const handleSelectEngineer = (engineerId) => { setSelectedEngineers(prev => { const newSelection = { ...prev }; if (Object.prototype.hasOwnProperty.call(newSelection, engineerId)) { delete newSelection[engineerId]; } else { newSelection[engineerId] = 10; } return newSelection; }); };
   const handleSubmit = () => { const assignments = Object.entries(selectedEngineers).filter(([, hours]) => hours > 0).map(([userId, allocatedHours]) => ({ userId, allocatedHours })); onComplete(assignments); };
+ 
   
   const loading = engineersLoading || assignmentsLoading;
 
@@ -73,7 +74,9 @@ const AssigneeSelector = ({ existingAssignments = [], onBack, onComplete, submit
         <button onClick={onBack} className="text-[#A9A9A9] hover:text-white cursor-pointer">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
         </button>
-        <div><h4 className="text-lg font-semibold text-[#EAEAEA]">Add Assignees & Capacity</h4></div>
+  <h4 className="text-lg font-semibold text-[#EAEAEA]">
+    Add Assignees
+  </h4>
       </div>
       <input type="text" placeholder="Search by name or skill..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full bg-[#161616] border border-[#2D2D2D] rounded-lg py-2 px-4 mb-4 text-[#EAEAEA] focus:outline-none focus:ring-1 focus:ring-[#007AFF]" />
       <div className="max-h-60 overflow-y-auto space-y-2 pr-2">

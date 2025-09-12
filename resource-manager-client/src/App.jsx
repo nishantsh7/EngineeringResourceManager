@@ -4,6 +4,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from './firebase/config';
 import useAuthStore from './store/authStore';
+import HomePage from './pages/HomePage';
 
 // Import all our pages and layouts
 import AuthPage from './pages/AuthPage';
@@ -40,17 +41,18 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/auth" element={!user ? <AuthPage /> : <Navigate to="/" />} />
+      <Route path="/" element={<HomePage />} />
+      <Route path="/auth" element={user ? <Navigate to="/dashboard" /> : <AuthPage />} />
       
-      <Route element={user ? <DashboardLayout /> : <Navigate to="/auth" />}>
-        <Route path="/" element={<DashboardPage />} />
+      <Route element={user ? <DashboardLayout /> : <Navigate to="/" />}>
+        <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/team" element={<TeamPage />} />
         <Route path="/team/:engineerId" element={<EngineerProfilePage />} />
         <Route path="/profile" element={<EngineerProfilePage />} />
 
-      </Route>
 
-      <Route path="*" element={<Navigate to={user ? "/" : "/auth"} />} />
+      </Route>
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 }

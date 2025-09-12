@@ -36,12 +36,13 @@ exports.createProject = async (req, res) => {
             description,
             acceptanceCriteria,
             priority,
+            startDate,
             dueDate,
             tags,
             assignments
         } = req.body;
 
-        if (!name || !priority || !dueDate || !description || !acceptanceCriteria) {
+        if (!name || !priority || !dueDate || !description || !acceptanceCriteria || !startDate) {
             return res.status(400).json({ error: 'Missing required project fields.' });
         }
 
@@ -51,6 +52,7 @@ exports.createProject = async (req, res) => {
             description,
             acceptanceCriteria,
             priority,
+            startDate,
             dueDate,
             tags: tags || [],
             status: 'Planning',
@@ -73,6 +75,8 @@ exports.createProject = async (req, res) => {
                     projectId: projectId,
                     userId: assignment.userId,
                     allocatedHours: assignment.allocatedHours,
+                    startDate:newProject.startDate,
+                    dueDate:newProject.dueDate,
                     createdAt: admin.firestore.FieldValue.serverTimestamp()
                 });
                 // 5. Add each engineer's ID to our summary array.

@@ -1,199 +1,81 @@
-// // import { useState } from 'react';
-// import { useCreateProject } from '../../hooks/useCreateProject';
-// import usePersistentState from '../../hooks/usePersistentState';
-
-// const AddProjectForm = ({ onProjectCreated }) => {
-//   const [name, setName] = usePersistentState('addProjectForm_name', '');
-//   const [description, setDescription] = usePersistentState('addProjectForm_description', '');
-//   const [acceptanceCriteria, setAcceptanceCriteria] = usePersistentState('addProjectForm_criteria', '');
-//   const [priority, setPriority] = usePersistentState('addProjectForm_priority', 'Medium');
-//   const [dueDate, setDueDate] = usePersistentState('addProjectForm_dueDate', '');
-//   const [tags, setTags] = usePersistentState('addProjectForm_tags', '');
-
-//   const { createProject, isLoading, error } = useCreateProject();
-
-//   // --- THIS IS THE CORRECTED FUNCTION ---
-//   const clearForm = () => {
-//     // 1. Define all the keys we use for this form in localStorage
-//     const formKeys = [
-//       'addProjectForm_name',
-//       'addProjectForm_description',
-//       'addProjectForm_criteria',
-//       'addProjectForm_priority',
-//       'addProjectForm_dueDate',
-//       'addProjectForm_tags'
-//     ];
-//     // 2. Explicitly remove each item from localStorage
-//     formKeys.forEach(key => window.localStorage.removeItem(key));
-
-//     // 3. Reset the component's current state for an immediate UI update
-//     setName('');
-//     setDescription('');
-//     setAcceptanceCriteria('');
-//     setPriority('Medium');
-//     setDueDate('');
-//     setTags('');
-//   };
-
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     const projectData = {
-//       name,
-//       description,
-//       acceptanceCriteria,
-//       priority,
-//       dueDate,
-//       tags: tags.split(',').map(tag => tag.trim()),
-//     };
-//     const success = await createProject(projectData);
-//    if (success) {
-//       clearForm(); 
-//       onProjectCreated(); 
-//     }
-//   };
-
-//   const handleCancel = () => {
-//     clearForm(); // Clear localStorage on cancel
-//     onProjectCreated(); // Close the modal
-//   };
-
-//   // Shared styles for form inputs using direct hex codes
-//   const inputStyles = "mt-2 block w-full bg-transparent border-b-2 border-[#1a1b26] focus:border-white focus:outline-none  p-2 text-[#EAEAEA] placeholder:text-[#242635] focus:ring-0 focus:border-[#007AFF]";
-
-//   return (
-//     <form onSubmit={handleSubmit}>
-//       {/* Reduced vertical gap for a more compact layout */}
-//       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-6">
-//         {/* Title (Project Name) */}
-//         <div className="sm:col-span-2">
-//           <label htmlFor="name" className="block text-sm font-medium text-[#84858c]">Title</label>
-//           <input
-//             type="text"
-//             id="name"
-//             value={name}
-//             onChange={(e) => setName(e.target.value)}
-//             required
-//             placeholder="e.g., Implement new dashboard UI"
-//             className={inputStyles}
-//           />
-//         </div>
-
-//         {/* Priority */}
-//         <div className="sm:col-span-1">
-//           <label htmlFor="priority" className="block text-sm font-medium text-[#84858c]">Priority</label>
-//           <select id="priority" value={priority} onChange={(e) => setPriority(e.target.value)} className={`${inputStyles} bg-[#1E1E1E]`}>
-//             <option className="bg-[#1E1E1E]">High</option>
-//             <option className="bg-[#1E1E1E]">Medium</option>
-//             <option className="bg-[#1E1E1E]">Low</option>
-//           </select>
-//         </div>
-
-//         {/* Due Date */}
-//         <div className="sm:col-span-1">
-//           <label htmlFor="dueDate" className="block text-sm font-medium text-[#84858c]">Due Date</label>
-//           <input type="date" id="dueDate" value={dueDate} onChange={(e) => setDueDate(e.target.value)} className={`${inputStyles} [color-scheme:dark]`} />
-//         </div>
-
-//         {/* Description */}
-//         <div className="sm:col-span-2">
-//           <label htmlFor="description" className="block text-sm font-medium text-[#84858c]">Description</label>
-//           <textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} rows={2} className={inputStyles} placeholder="Summarize the task" />
-//         </div>
-
-//         {/* Acceptance Criteria */}
-//         <div className="sm:col-span-2">
-//           <label htmlFor="criteria" className="block text-sm font-medium text-[#84858c]">Acceptance Criteria</label>
-//           <textarea id="criteria" value={acceptanceCriteria} onChange={(e) => setAcceptanceCriteria(e.target.value)} rows={3} className={inputStyles} placeholder="- UI matches the design file&#10;- All buttons are functional&#10;- Deploys without errors" />
-//         </div>
-
-//         {/* Tags */}
-//         <div className="sm:col-span-2">
-//           <label htmlFor="tags" className="block text-sm font-medium text-[#84858c]">Labels / Tags</label>
-//           <input type="text" id="tags" value={tags} onChange={(e) => setTags(e.target.value)} className={inputStyles} placeholder="frontend, bugfix, UI (comma-separated)" />
-//         </div>
-//       </div>
-      
-//       {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
-      
-//       {/* Reduced margin-top for a more compact layout */}
-//       <div className="flex justify-end gap-4 mt-6">
-//           <button type="button" onClick={handleCancel} disabled={isLoading} className="py-2 cursor-pointer px-4 bg-[#2D2D2D] hover:bg-[#3f3f3f] text-[#EAEAEA] font-semibold rounded-lg disabled:opacity-50 transition-colors">
-//               Cancel
-//           </button>
-//           <button type="submit" disabled={isLoading} className="py-2 px-4 cursor-pointer bg-[#1a1b26] hover:bg-[black] text-[#e4ddbc] font-semibold rounded-lg disabled:opacity-50 transition-colors">
-//               {isLoading ? 'Creating...' : 'Create Project'}
-//           </button>
-//       </div>
-//     </form>
-//   );
-// };
-
-// export default AddProjectForm;
-
 import { useState } from 'react';
-const AddProjectForm = ({ projectData, setProjectData, onFormComplete, onCancel }) => {
+
+// Add isEditMode to the props to handle the "Save Changes" button text
+const AddProjectForm = ({ projectData, setProjectData, onFormComplete, onCancel, isEditMode = false }) => {
   const [errors, setErrors] = useState({});
+
+  const today = new Date().toISOString().split('T')[0];
   const handleChange = (e) => {
     const { id, value } = e.target;
     setProjectData(prevData => ({
       ...prevData,
       [id]: value,
     }));
+    if (errors[id]) {
+      setErrors(prevErrors => {
+        const newErrors = { ...prevErrors };
+        delete newErrors[id];
+        return newErrors;
+      });
+    }
   };
+
   const validate = () => {
     const newErrors = {};
     if (!projectData.name?.trim()) newErrors.name = 'Title is required.';
-    if (!projectData.dueDate) newErrors.dueDate = 'Due date is required.';
+     if (!projectData.dueDate) {
+      newErrors.dueDate = 'Due date is required.';
+    } else if (new Date(projectData.dueDate) < new Date(today)) {
+      // Also check if the selected date is before today.
+      newErrors.dueDate = 'Due date cannot be in the past.';
+    }
+    if (!projectData.startDate) {
+      newErrors.startDate = 'Start date is required.';
+    } else if (new Date(projectData.startDate) < new Date(today)) {
+      // Also check if the selected date is before today.
+      newErrors.startDate = 'Start date cannot be in the past.';
+    }
     if (!projectData.description?.trim()) newErrors.description = 'Description is required.';
+    if (!projectData.tags?.trim()) newErrors.tags = 'Add reuiqred skills or tags.';
     if (!projectData.acceptanceCriteria?.trim()) newErrors.acceptanceCriteria = 'Acceptance criteria are required.';
-    // Priority has a default, so it's always valid. Tags are optional.
     return newErrors;
   };
 
-    const handleSubmit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      return; // Stop the submission if there are errors
+      return;
     }
-    setErrors({}); // Clear any old errors
-    onFormComplete(); 
+    setErrors({});
+    if (isEditMode) {
+        onFormComplete(projectData);
+    } else {
+        onFormComplete(); 
+    }
   };
-  // Shared styles for form inputs using direct hex codes
   const getInputStyles = (fieldName) => {
-    const baseStyles = "mt-2 block w-full bg-transparent border-b-2 border-[#1a1b26] focus:border-white focus:outline-none  p-2 text-[#EAEAEA] placeholder:text-[#242635] focus:ring-0 focus:border-[#007AFF]";
+    const baseStyles = "mt-1 block w-full bg-transparent border-b-2 focus:outline-none p-2 text-[#EAEAEA] placeholder:text-[#242635] focus:ring-0";
     return errors[fieldName] 
       ? `${baseStyles} border-red-500 focus:border-red-500` 
-      : `${baseStyles} border-[#3D3D3D] focus:border-[#007AFF]`;
+      : `${baseStyles} border-[#1a1b26] focus:border-white`;
   };
+
+  const errorTextClasses = "text-red-500 text-xs mt-1";
+
   return (
     <form onSubmit={handleSubmit} noValidate>
-      {/* <div className="flex items-center gap-4 mb-4">
-        <div>
-            <h4 className="text-lg font-semibold text-[#EAEAEA]">Project Details</h4>
-            <p className="text-sm text-[#A9A9A9]">Step 1 of 2</p>
-        </div>
-      </div> */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-6">
-        {/* Title (Project Name) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+        {/* Title */}
         <div className="sm:col-span-2">
           <label htmlFor="name" className="block text-sm font-medium text-[#84858c]">Title</label>
-          <input
-            type="text"
-            id="name"
-            value={projectData.name || ''}
-            onChange={handleChange} 
-            required
-            placeholder="e.g., Implement new dashboard UI"
-            className={getInputStyles('name')}
-          />
-           {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+          <input type="text" id="name" value={projectData.name || ''} onChange={handleChange} required placeholder="e.g., Implement new dashboard UI" className={getInputStyles('name')} />
+          {errors.name && <p className={errorTextClasses}>{errors.name}</p>}
         </div>
 
         {/* Priority */}
-        <div className="sm:col-span-1">
+        <div className="sm:col-span-2">
           <label htmlFor="priority" className="block text-sm font-medium text-[#84858c]">Priority</label>
           <select id="priority" value={projectData.priority || 'Medium'} onChange={handleChange} className={`${getInputStyles('priority')} bg-[#1E1E1E]`}>
             <option className="bg-[#1E1E1E]">High</option>
@@ -202,37 +84,49 @@ const AddProjectForm = ({ projectData, setProjectData, onFormComplete, onCancel 
           </select>
         </div>
 
-        {/* Due Date */}
         <div className="sm:col-span-1">
+          <label htmlFor="startDate" className="block text-sm font-medium text-[#84858c]">Start Date</label>
+          <input type="date" id="startDate" value={projectData.startDate || ''} onChange={handleChange} min={today} className={`${getInputStyles('startDate')} [color-scheme:dark]`} />
+          {errors.startDate && <p className={errorTextClasses}>{errors.startDate}</p>}
+        </div>
+
+        {/* Due Date */}
+         <div className="sm:col-span-1">
           <label htmlFor="dueDate" className="block text-sm font-medium text-[#84858c]">Due Date</label>
-          <input type="date" id="dueDate" value={projectData.dueDate || ''} onChange={handleChange}  className={`${getInputStyles('dueDate')} [color-scheme:dark]`} />
+          {/* --- 3. The 'min' attribute is added here --- */}
+          {/* This prevents users from selecting a past date in the date picker UI. */}
+          <input type="date" id="dueDate" value={projectData.dueDate || ''} onChange={handleChange} min={today} className={`${getInputStyles('dueDate')} [color-scheme:dark]`} />
+          {errors.dueDate && <p className={errorTextClasses}>{errors.dueDate}</p>}
         </div>
 
         {/* Description */}
         <div className="sm:col-span-2">
           <label htmlFor="description" className="block text-sm font-medium text-[#84858c]">Description</label>
           <textarea id="description" value={projectData.description || ''} onChange={handleChange} rows={2} className={getInputStyles('description')} placeholder="Summarize the task" />
+          {errors.description && <p className={errorTextClasses}>{errors.description}</p>}
         </div>
 
         {/* Acceptance Criteria */}
         <div className="sm:col-span-2">
-          <label htmlFor="criteria" className="block text-sm font-medium text-[#84858c]">Acceptance Criteria</label>
-          <textarea id="acceptanceCriteria" value={projectData.acceptanceCriteria || ''} onChange={handleChange} rows={3} className={getInputStyles('acceptanceCriteria')} placeholder="- UI matches the design file&#10;- All buttons are functional&#10;- Deploys without errors" />
+          <label htmlFor="acceptanceCriteria" className="block text-sm font-medium text-[#84858c]">Acceptance Criteria</label>
+          <textarea id="acceptanceCriteria" value={projectData.acceptanceCriteria || ''} onChange={handleChange} rows={2} className={getInputStyles('acceptanceCriteria')} placeholder="- UI matches the design file&#10;- All buttons are functional" />
+          {errors.acceptanceCriteria && <p className={errorTextClasses}>{errors.acceptanceCriteria}</p>}
         </div>
 
         {/* Tags */}
         <div className="sm:col-span-2">
-          <label htmlFor="tags" className="block text-sm font-medium text-[#84858c]">Labels / Tags</label>
+          <label htmlFor="tags" className="block text-sm font-medium text-[#84858c]">Skills / Tags</label>
           <input type="text" id="tags" value={projectData.tags || ''} onChange={handleChange} className={getInputStyles('tags')} placeholder="frontend, bugfix, UI (comma-separated)" />
-        </div>
+          {errors.tags && <p className={errorTextClasses}>{errors.tags}</p>}
       </div>
-      {/* Reduced margin-top for a more compact layout */}
+      </div>
+      
       <div className="flex justify-end gap-4 mt-6">
-          <button type="button" onClick={onCancel} className="py-2 cursor-pointer px-4 bg-[#2D2D2D] hover:bg-[#3f3f3f] text-[#EAEAEA] font-semibold rounded-lg disabled:opacity-50 transition-colors">
+          <button type="button" onClick={onCancel} className="py-2 cursor-pointer px-4 bg-[#2D2D2D] hover:bg-[#3f3f3f] text-[#EAEAEA] font-semibold rounded-lg">
               Cancel
           </button>
-          <button type="submit" className="py-2 px-4 cursor-pointer bg-[#1a1b26] hover:bg-[black] text-[#e4ddbc] font-semibold rounded-lg disabled:opacity-50 transition-colors">
-              Add Assignees
+          <button type="submit" className="py-2 px-4 cursor-pointer bg-[#1a1b26] hover:bg-[black] text-[#e4ddbc] font-semibold rounded-lg">
+              {isEditMode ? 'Save Changes' : 'Add Assignees'}
           </button>
       </div>
     </form>
