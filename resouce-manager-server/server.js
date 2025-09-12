@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const admin = require('firebase-admin');
+const dotenv = require("dotenv");
+dotenv.config();
 
 // --- PRODUCTION-READY INITIALIZATION ---
 // Check if the environment variable is set
@@ -10,7 +12,7 @@ if (!process.env.FIREBASE_SERVICE_KEY_BASE64) {
 
 // Decode the base64 encoded key from the environment variable
 const serviceAccountBase64 = process.env.FIREBASE_SERVICE_KEY_BASE64;
-const serviceAccountJson = Buffer.from(serviceAccountBase64, 'base64').toString('utf-8');
+const serviceAccountJson = Buffer.from(serviceAccountBase64, "base64").toString('utf-8');
 const serviceAccount = JSON.parse(serviceAccountJson);
 
 admin.initializeApp({
