@@ -1,18 +1,29 @@
 const express = require('express');
 const cors = require('cors');
 const admin = require('firebase-admin');
+const fs = require('fs'); // <-- Import the Node.js file system module
 
-// --- PRODUCTION INITIALIZATION ---
-// In the cloud, this environment variable is the ONLY source for the key.
-if (!process.env.FIREBASE_SERVICE_KEY) {
-    throw new Error('The FIREBASE_SERVICE_ACCOUNT environment variable is not set.');
+// --- PRODUCTION-GRADE INITIALIZATION ---
+let serviceAccount;
+const secretPath = '/etc/secrets/firebase-key'; // This is the path where Cloud Run will mount our secret
+
+// In production (Cloud Run), we expect the secret to be mounted as a file.
+if (fs.existsSync(secretPath)) {
+    const serviceAccountJson = fs.readFileSync(secretPath, 'utf8');
+    serviceAccount = JSON.parse(serviceAccountJson);
+} else if (process.env.NODE_ENV !== 'production') {
+    // For local development, we fall back to reading the local JSON file.
+    console.log('Running in local development mode, reading key file directly.');
+    serviceAccount = require('./engineering-resource-service-account-key.json');
+} else {
+    // If we're in production and the file doesn't exist, we must crash.
+    throw new Error(`Production environment detected, but secret file not found at ${secretPath}`);
 }
-const serviceAccountJson = process.env.FIREBASE_SERVICE_KEY;
-const serviceAccount = JSON.parse(serviceAccountJson);
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
 });
+
 
 const app = express();
 // Cloud Run provides the PORT environment variable, defaulting to 8080.
