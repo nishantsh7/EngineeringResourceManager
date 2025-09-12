@@ -71,7 +71,7 @@ jobs:
             --region us-central1 \
             --platform managed \
             --allow-unauthenticated \
-            --set-env-vars "FIREBASE_SERVICE_KEY="projects/897243952721/secrets/FIREBASE_SERVICE_KEY" \
+            --set-env-vars "FIREBASE_SERVICE_KEY=projects/897243952721/secrets/FIREBASE_SERVICE_KEY" \
             --quiet
 
       # 🚀 Deploy Frontend to Cloud Run
