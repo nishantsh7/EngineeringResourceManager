@@ -20,7 +20,7 @@ export const useCreateProject = () => {
     try {
       const token = await currentUser.getIdToken();
       
-      await axios.post('http://localhost:5000/api/projects', projectData, {
+      await axios.post('https://projex-backend-897243952721.us-central1.run.app/api/projects', projectData, {
         headers: {
           Authorization: `Bearer ${token}`
         }

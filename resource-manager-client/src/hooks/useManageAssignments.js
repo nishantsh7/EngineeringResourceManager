@@ -26,7 +26,7 @@ export const useManageAssignments = () => {
       await Promise.all(
         newAssignments.map(assignment =>
           axios.post(
-            'http://localhost:5000/api/assignments',
+            'https://projex-backend-897243952721.us-central1.run.app/api/assignments',
             {
               projectId,
               userId: assignment.userId,
@@ -51,7 +51,7 @@ export const useManageAssignments = () => {
     try {
       const token = await getToken();
       await axios.put(
-        `http://localhost:5000/api/assignments/${assignmentId}`,
+        `https://projex-backend-897243952721.us-central1.run.app/api/assignments/${assignmentId}`,
         { allocatedHours },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -69,7 +69,7 @@ export const useManageAssignments = () => {
     setError(null);
     try {
       const token = await getToken();
-      await axios.delete(`http://localhost:5000/api/assignments/${assignmentId}`, {
+      await axios.delete(`https://projex-backend-897243952721.us-central1.run.app/api/assignments/${assignmentId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
     } catch (err) {

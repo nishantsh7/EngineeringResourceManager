@@ -17,7 +17,7 @@ export const useUpdateProfile = () => {
     setError(null);
     try {
       const token = await getToken();
-      await axios.put(`http://localhost:5000/api/users/${userId}`, updateData, {
+      await axios.put(`https://projex-backend-897243952721.us-central1.run.app/api/users/${userId}`, updateData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return true; // Indicate success

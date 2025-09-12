@@ -18,7 +18,7 @@ export const useManageProject = () => {
     setError(null);
     try {
       const token = await getToken();
-      await axios.put(`http://localhost:5000/api/projects/${projectId}`, updateData, {
+      await axios.put(`https://projex-backend-897243952721.us-central1.run.app/api/projects/${projectId}`, updateData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return true; // Indicate success
@@ -37,7 +37,7 @@ export const useManageProject = () => {
     setError(null);
     try {
       const token = await getToken();
-      await axios.delete(`http://localhost:5000/api/projects/${projectId}`, {
+      await axios.delete(`https://projex-backend-897243952721.us-central1.run.app/api/projects/${projectId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return true; // Indicate success
