@@ -1,6 +1,3 @@
-# This workflow automates the deployment of the frontend and backend to Google Cloud Run.
-# It triggers automatically on every push to the 'main' branch.
-
 name: Deploy Projex to Google Cloud Run
 
 on:
@@ -13,7 +10,7 @@ jobs:
     name: Build and Deploy to Google Cloud Run
     runs-on: ubuntu-latest
     
-    # Required permissions for the google-github-actions/auth action
+    # Grant permissions for the new google-github-actions/auth method
     permissions:
       contents: 'read'
       id-token: 'write'
@@ -21,7 +18,8 @@ jobs:
     env:
       GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
       GCP_REPO_NAME: ${{ secrets.GCP_REPO_NAME }}
-      # Frontend Firebase public config, passed as build arguments to Docker
+      FIREBASE_SERVICE_KEY_BASE64: ${{ secrets.FIREBASE_SERVICE_KEY_BASE64 }}
+      # Frontend Firebase config (your setup is perfect)
       VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
       VITE_AUTH_DOMAIN: ${{ secrets.VITE_AUTH_DOMAIN }}
       VITE_PROJECT_ID: ${{ secrets.VITE_PROJECT_ID }}
@@ -37,8 +35,8 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          # This uses the DEPLOYMENT key to grant GitHub Actions permission to deploy
-          credentials_json: ${{ secrets.GCP_DEPLOY_SA_KEY }}
+          # This uses the DEPLOYMENT KEY to give GitHub Actions permission to deploy
+          credentials_json: ${{ secrets.GCP_SERVICE_KEY }}
 
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
@@ -46,13 +44,13 @@ jobs:
       - name: Configure Docker Authentication
         run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
 
-      # Build and push the backend image to Google Artifact Registry
+      # 🚀 Build & Push Backend Image
       - name: Build and Push Backend Docker Image
         run: |
           docker build -t us-central1-docker.pkg.dev/$GCP_PROJECT_ID/$GCP_REPO_NAME/backend:latest ./resouce-manager-server
           docker push us-central1-docker.pkg.dev/$GCP_PROJECT_ID/$GCP_REPO_NAME/backend:latest
 
-      # Build and push the frontend image, passing in the VITE variables as build arguments
+      # 🚀 Build & Push Frontend Image
       - name: Build and Push Frontend Docker Image
         run: |
           docker build \
@@ -66,7 +64,7 @@ jobs:
             -t us-central1-docker.pkg.dev/$GCP_PROJECT_ID/$GCP_REPO_NAME/frontend:latest ./resource-manager-client
           docker push us-central1-docker.pkg.dev/$GCP_PROJECT_ID/$GCP_REPO_NAME/frontend:latest
 
-      # Deploy the backend image to Cloud Run
+      # 🚀 Deploy Backend to Cloud Run
       - name: Deploy Backend to Cloud Run
         run: |
           gcloud run deploy projex-backend \
@@ -74,10 +72,12 @@ jobs:
             --region us-central1 \
             --platform managed \
             --allow-unauthenticated \
-            --set-env-vars "FIREBASE_SERVICE_KEY_BASE64=${{ secrets.FIREBASE_SERVICE_KEY_BASE64 }}" \
+            # --- THIS IS THE CRITICAL FIX ---
+            # We pass the APPLICATION KEY to the running container so the Node.js app can talk to Firebase.
+            --set-env-vars "FIREBASE_SERVICE_KEY_BASE64=$FIREBASE_SERVICE_KEY_BASE64" \
             --quiet
 
-      # Deploy the frontend image to Cloud Run
+      # 🚀 Deploy Frontend to Cloud Run
       - name: Deploy Frontend to Cloud Run
         run: |
           gcloud run deploy projex-frontend \
@@ -86,3 +86,4 @@ jobs:
             --platform managed \
             --allow-unauthenticated \
             --quiet
+
