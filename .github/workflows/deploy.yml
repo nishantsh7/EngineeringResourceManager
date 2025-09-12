@@ -68,17 +68,13 @@ jobs:
       - name: Deploy Backend to Cloud Run
         run: |
           gcloud run deploy projex-backend \
-            --image us-central1-docker.pkg.dev/$GCP_PROJECT_ID/$GCP_REPO_NAME/backend:latest \
-            --region us-central1 \
-            --platform managed \
-            --allow-unauthenticated \
-            # --- THIS IS THE CRITICAL CHANGE ---
-            # It securely mounts your Google Cloud Secret as a file inside the container.
-            # Your updated index.js will read this file.
-            --update-secrets="/etc/secrets/firebase-key=FIREBASE_SERVICE_KEY:latest" \
-            # We also set NODE_ENV to production as a best practice.
-            --set-env-vars="NODE_ENV=production" \
-            --quiet
+           --image us-central1-docker.pkg.dev/$GCP_PROJECT_ID/$GCP_REPO_NAME/backend:latest \
+          --region us-central1 \
+          --platform managed \
+          --allow-unauthenticated \
+          --update-secrets="/etc/secrets/firebase-key=FIREBASE_SERVICE_KEY:latest" \
+          --set-env-vars="NODE_ENV=production" \
+          --quiet
 
       # Deploy the frontend image to Cloud Run
       - name: Deploy Frontend to Cloud Run
