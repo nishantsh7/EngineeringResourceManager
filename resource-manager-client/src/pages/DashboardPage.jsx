@@ -76,6 +76,13 @@ const DashboardPage = () => {
     const success = await deleteProject(selectedProject.id);
     if (success) handleCloseModal();
   };
+   if (!profile) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="w-8 h-8 border-2 border-[#e4ddbc] border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     // This is a React Fragment, as the parent layout provides the main container
