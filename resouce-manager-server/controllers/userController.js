@@ -12,7 +12,7 @@
 
             const updateData = {};
             // Only add fields to the update object if they were provided
-            if (name) updateData.displayName = name;
+            if (name) updateData.name = name;
             if (skills) updateData.skills = skills.split(',').map(s => s.trim()).filter(Boolean);
             if (duration) {
                 updateData.duration = duration;
