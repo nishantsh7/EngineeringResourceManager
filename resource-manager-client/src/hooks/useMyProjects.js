@@ -1,5 +1,5 @@
 import { collection, query, where } from 'firebase/firestore';
-import { useCollectionData } from 'react-firebase-hooks/firestore';
+import { useCollection } from 'react-firebase-hooks/firestore';
 import { db } from '../firebase/config';
 import useAuthStore from '../store/authStore';
 
@@ -12,7 +12,8 @@ export const useMyProjects = () => {
     : null;
 
   // 4. Use the hook to fetch the data. If the query is null, it won't fetch anything.
-  const [projects, loading, error] = useCollectionData(q, { idField: 'id' });
+  const [snapshot, loading, error] = useCollection(q);
+  const projects = snapshot ? snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) : [];
 
   // 5. Return the personalized list of projects.
   return { myProjects: projects, loading, error };

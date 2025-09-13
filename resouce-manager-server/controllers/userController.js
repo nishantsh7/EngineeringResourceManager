@@ -8,7 +8,7 @@
 
         try {
             const userId = req.params.id;
-            const { name, skills, duration} = req.body;
+            const {name, skills, duration} = req.body;
 
             const updateData = {};
             // Only add fields to the update object if they were provided

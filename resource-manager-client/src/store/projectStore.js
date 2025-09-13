@@ -1,7 +1,7 @@
-// src/store/projectStore.js
 import { create } from 'zustand';
-import { collection, onSnapshot } from 'firebase/firestore';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '../firebase/config';
+import useAuthStore from './authStore';
 
 // This will hold the unsubscribe function for our Firestore listener
 let unsubscribe = () => {};
@@ -14,13 +14,29 @@ const useProjectStore = create((set) => ({
 
   // Action to fetch projects and set up the real-time listener
   fetchProjects: () => {
+    // Get current auth state
+    const { user } = useAuthStore.getState();
+    
+    // Don't fetch if no user
+    if (!user) {
+      set({ projects: [], loading: false, error: null });
+      return;
+    }
+
     set({ loading: true, error: null });
     
-    const projectsCollection = collection(db, 'projects');
+    // Clean up any existing listener
+    unsubscribe();
+    
+    // Create query filtered by the current user
+    const projectsQuery = query(
+      collection(db, 'projects'),
+      where('createdBy', '==', user.uid) // Adjust this field name based on your data structure
+    );
     
     // onSnapshot creates a real-time listener
     unsubscribe = onSnapshot(
-      projectsCollection, 
+      projectsQuery, 
       (snapshot) => {
         // This function runs every time the collection changes
         const projectsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));

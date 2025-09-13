@@ -20,7 +20,7 @@ const DashboardPage = () => {
   const { profile } = useAuthStore();
   const { createProject, isLoading: isCreating } = useCreateProject();
   const { updateProject, deleteProject, isLoading: isManaging } = useManageProject();
-
+  const [searchTerm, setSearchTerm] = useState('');
   // --- State for controlling all modals ---
   const [modalView, setModalView] = useState(null); // Can be 'add', 'manage', 'edit', or 'delete'
   const [selectedProject, setSelectedProject] = useState(null);
@@ -85,15 +85,17 @@ const DashboardPage = () => {
   }
 
   return (
-    // This is a React Fragment, as the parent layout provides the main container
     <>
       <header className="flex justify-between items-center mb-8">
         <div className="relative">
-          <input type="text" placeholder="Search" className="bg-[#181818] rounded-lg py-2 pl-10 pr-4 w-full max-w-xs text-[#edeef4] focus:outline-none" />
+          <input type="text" placeholder="Search by name, description or tag" 
+          className="bg-[#181818] rounded-lg py-2 pl-10 pr-4 min-w-80  text-[#edeef4] focus:outline-none" 
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}/>
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><SearchIcon /></div>
         </div>
         <div 
-          className="w-9 h-9 rounded-full grid place-items-center flex-shrink-0 bg-[#e4ddbc] border-2 border-[#1E1E1E]"
+          className="w-11 h-11 rounded-full grid place-items-center flex-shrink-0 bg-[#e4ddbc] border-2 border-[#1E1E1E]"
         >
           {/* Add a check for assignee.name before using it */}
           <span className="font-bold text-xs text-gray-800">
@@ -113,13 +115,14 @@ const DashboardPage = () => {
             </div>
             {/* Pass all the necessary handlers down to the ProjectList */}
             <ProjectList 
+              searchTerm={searchTerm}
               onManageClick={(p) => handleOpenModal('manage', p)} 
               onEditClick={(p) => handleOpenModal('edit', p)} 
               onDeleteClick={(p) => handleOpenModal('delete', p)} 
             />
           </section>
         )}
-        {profile?.role === 'Engineer' && <MyAssignmentsList />}
+        {profile?.role === 'Engineer' && <MyAssignmentsList searchTerm={searchTerm} />}
       </div>
 
       {/* A single Modal component that intelligently renders the correct content */}
