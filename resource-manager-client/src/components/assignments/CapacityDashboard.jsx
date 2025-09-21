@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useEngineers } from '../../hooks/useEngineers';
 import { useAssignments } from '../../hooks/useAssignments';
 import { Link } from 'react-router-dom';
-
+import { useProjects } from '../../hooks/useProjects'; 
 // A helper component for the progress bar with new styling
 const CapacityBar = ({ allocated, capacity }) => {
   const percentage = capacity > 0 ? (allocated / capacity) * 100 : 0;
@@ -43,34 +43,44 @@ const StatusBadge = ({ allocated, capacity }) => {
 };
 
 const CapacityDashboard = () => {
-  // 1. Fetch all engineers and all assignments from our hooks
+  // --- 2. Fetch all three required data sources ---
   const { engineers, loading: engineersLoading, error: engineersError } = useEngineers();
   const { assignments, loading: assignmentsLoading, error: assignmentsError } = useAssignments();
-  console.log('Engineers:', engineers);
-  console.log('Assignments:', assignments);
+  const { projects, loading: projectsLoading, error: projectsError } = useProjects();
 
-  // 2. Perform the capacity calculation.
-  // We use `useMemo` as a performance optimization. This calculation will only
-  // re-run when the 'engineers' or 'assignments' data actually changes.
+  // --- 3. This is the new, smarter workload calculation ---
   const engineerWorkloads = useMemo(() => {
-    if (!engineers || !assignments) return [];
+    // Wait until all data has loaded before calculating
+    if (!engineers || !assignments || !projects) return [];
 
-    // Create a map to easily look up an engineer's total hours
+    const today = new Date();
+    // First, create a Set of active project IDs for very fast lookups
+    const activeProjectIds = new Set(
+      projects
+        .filter(p => p.dueDate && new Date(p.dueDate) >= today)
+        .map(p => p.id)
+    );
+
     const assignmentMap = new Map();
     assignments.forEach(assignment => {
-      const currentHours = assignmentMap.get(assignment.userId) || 0;
-      assignmentMap.set(assignment.userId, currentHours + assignment.allocatedHours);
+      // THE KEY: Only include this assignment in the calculation if its project is active.
+      if (activeProjectIds.has(assignment.projectId)) {
+        const currentHours = assignmentMap.get(assignment.userId) || 0;
+        assignmentMap.set(assignment.userId, currentHours + assignment.allocatedHours);
+      }
     });
 
-    // Map over the engineers list and add their calculated workload
     return engineers.map(engineer => ({
       ...engineer,
       allocatedHours: assignmentMap.get(engineer.id) || 0,
     }));
-  }, [engineers, assignments]);
+  }, [engineers, assignments, projects]); // Recalculate if any data source changes
 
-  // Handle loading and error states for both data sources
-  if (engineersLoading || assignmentsLoading) {
+  // Consolidate loading and error states
+  const loading = engineersLoading || assignmentsLoading || projectsLoading;
+  const error = engineersError || assignmentsError || projectsError;
+
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-64 bg-[#0f1419] rounded-2xl border border-[#1a1f29]">
         <div className="flex flex-col items-center space-y-3">
@@ -81,7 +91,7 @@ const CapacityDashboard = () => {
     );
   }
   
-  if (engineersError || assignmentsError) {
+  if (error) {
     return (
       <div className="flex items-center justify-center min-h-64 bg-[#0f1419] rounded-2xl border border-red-900/20">
         <p className="text-red-400 text-sm">Error loading data. Please try again.</p>
@@ -91,29 +101,20 @@ const CapacityDashboard = () => {
 
   return (
     <div className="space-y-4">
-      {/* Header */}
+      {/* The rest of your JSX is perfect and requires no changes. */}
+      {/* It will now automatically display the new, correctly calculated workloads. */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2 text-sm text-[#8b949e]">
-          <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-          <span>Available</span>
-          <div className="w-2 h-2 rounded-full bg-[#e4ddbc]"></div>
-          <span>Near Capacity</span>
-          <div className="w-2 h-2 rounded-full bg-red-400"></div>
-          <span>Overloaded</span>
+          <div className="w-2 h-2 rounded-full bg-emerald-500"></div><span>Available</span>
+          <div className="w-2 h-2 rounded-full bg-[#e4ddbc]"></div><span>Near Capacity</span>
+          <div className="w-2 h-2 rounded-full bg-red-400"></div><span>Overloaded</span>
         </div>
       </div>
-
-      {/* Cards Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {engineerWorkloads.map((engineer) => {
           const percentage = engineer.capacity > 0 ? (engineer.allocatedHours / engineer.capacity) * 100 : 0;
-          
           return (
-            <div 
-              key={engineer.id}
-              className="bg-[#0f1419] border border-[#1a1f29] rounded-xl p-6 hover:border-[#e4ddbc]/20 transition-all duration-200 hover:shadow-lg hover:shadow-[#e4ddbc]/5"
-            >
-              {/* Engineer Info */}
+            <div key={engineer.id} className="bg-[#0f1419] border border-[#1a1f29] rounded-xl p-6 hover:border-[#e4ddbc]/20 transition-all duration-200 hover:shadow-lg hover:shadow-[#e4ddbc]/5">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
                   <h3 className="font-medium text-white text-lg mb-1">{engineer.name}</h3>
@@ -121,34 +122,20 @@ const CapacityDashboard = () => {
                 </div>
                 <StatusBadge allocated={engineer.allocatedHours} capacity={engineer.capacity} />
               </div>
-
-              {/* Capacity Info */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-[#8b949e] text-sm">Workload</span>
                   <div className="text-right">
-                    <div className="text-white font-medium">
-                      {engineer.allocatedHours} / {engineer.capacity} hrs
-                    </div>
-                    <div className="text-[#8b949e] text-xs">
-                      {percentage.toFixed(0)}% utilized
-                    </div>
+                    <div className="text-white font-medium">{engineer.allocatedHours} / {engineer.capacity} hrs</div>
+                    <div className="text-[#8b949e] text-xs">{percentage.toFixed(0)}% utilized</div>
                   </div>
                 </div>
-                
                 <CapacityBar allocated={engineer.allocatedHours} capacity={engineer.capacity} />
               </div>
-
-              {/* Action Button */}
               <div className="mt-4 pt-4 border-t border-[#1a1f29]">
-                <Link 
-                  to={`/team/${engineer.id}`} 
-                  className="inline-flex items-center text-sm font-medium text-[#e4ddbc] hover:text-[#e4ddbc]/80 transition-colors duration-200"
-                >
+                <Link to={`/team/${engineer.id}`} className="inline-flex items-center text-sm font-medium text-[#e4ddbc] hover:text-[#e4ddbc]/80 transition-colors duration-200">
                   View Details
-                  <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
+                  <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                   <span className="sr-only">, {engineer.name}</span>
                 </Link>
               </div>
@@ -156,8 +143,6 @@ const CapacityDashboard = () => {
           );
         })}
       </div>
-
-      {/* Summary Stats */}
       <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-[#0f1419] border border-[#1a1f29] rounded-xl p-4">
           <div className="text-[#8b949e] text-sm mb-1">Total Engineers</div>
@@ -165,15 +150,11 @@ const CapacityDashboard = () => {
         </div>
         <div className="bg-[#0f1419] border border-[#1a1f29] rounded-xl p-4">
           <div className="text-[#8b949e] text-sm mb-1">Available Capacity</div>
-          <div className="text-2xl font-semibold text-emerald-400">
-            {engineerWorkloads.reduce((acc, eng) => acc + (eng.capacity - eng.allocatedHours), 0)} hrs
-          </div>
+          <div className="text-2xl font-semibold text-emerald-400">{engineerWorkloads.reduce((acc, eng) => acc + (eng.capacity - eng.allocatedHours), 0)} hrs</div>
         </div>
         <div className="bg-[#0f1419] border border-[#1a1f29] rounded-xl p-4">
           <div className="text-[#8b949e] text-sm mb-1">Overloaded</div>
-          <div className="text-2xl font-semibold text-red-400">
-            {engineerWorkloads.filter(eng => eng.allocatedHours > eng.capacity).length}
-          </div>
+          <div className="text-2xl font-semibold text-red-400">{engineerWorkloads.filter(eng => eng.allocatedHours > eng.capacity).length}</div>
         </div>
       </div>
     </div>

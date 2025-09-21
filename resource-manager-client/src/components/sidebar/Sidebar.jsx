@@ -20,15 +20,26 @@ const Sidebar = () => {
         <nav className="space-y-4">
           <NavLink to="/dashboard" className={getLinkClass} end>
             <Icon path="M3.75 3v11.25A2.25 2.25 0 006 16.5h12A2.25 2.25 0 0020.25 14.25V3M3.75 3v-1.5A2.25 2.25 0 016 0h12A2.25 2.25 0 0120.25 1.5V3M3.75 3H1.5m19.5 0H22.5" />
-            {profile?.role==="Manager"?<span>Projects</span>:<span>Assignments</span>}
+            {/* Your excellent dynamic text remains */}
+            {profile?.role === "Manager" ? <span>Projects</span> : <span>Assignments</span>}
           </NavLink>
           
+          {/* This block now contains ALL manager-specific links */}
           {profile?.role === 'Manager' && (
-            <NavLink to="/team" className={getLinkClass}>
-              <Icon path="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493m0 0v-.003c0-1.113-.285-2.16-.786-3.07m0 0v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-4.663M12 12A3 3 0 1012 6a3 3 0 000 6z" />
-              <span>Team</span>
-            </NavLink>
+            <>
+              <NavLink to="/team" className={getLinkClass}>
+                <Icon path="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493m0 0v-.003c0-1.113-.285-2.16-.786-3.07m0 0v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-4.663M12 12A3 3 0 1012 6a3 3 0 000 6z" />
+                <span>Team</span>
+              </NavLink>
+
+            
+              <NavLink to="/admin" className={getLinkClass}>
+                <Icon path="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
+                <span>Admin</span>
+              </NavLink>
+            </>
           )}
+
           {profile?.role === 'Engineer' && (
             <NavLink to="/profile" className={getLinkClass}>
               <Icon path="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />

@@ -35,5 +35,28 @@
         }
     };
 
-    module.exports = { updateUser };
+    const updateUserAdmin = async (req, res) => {
+    try {
+        const userIdToUpdate = req.params.id;
+        const { role, seniority } = req.body;
+
+        const updateData = {};
+        if (role) updateData.role = role;
+        if (seniority) updateData.seniority = seniority;
+
+        if (Object.keys(updateData).length === 0) {
+            return res.status(400).json({ error: 'No role or seniority provided for update.' });
+        }
+
+        const userRef = db.collection('users').doc(userIdToUpdate);
+        await userRef.update(updateData);
+
+        res.status(200).json({ message: `User ${userIdToUpdate} updated successfully.` });
+    } catch (error) {
+        console.error("Error updating user (admin):", error);
+        res.status(500).json({ error: 'Failed to update user.' });
+    }
+};
+
+    module.exports = { updateUser,updateUserAdmin };
     
